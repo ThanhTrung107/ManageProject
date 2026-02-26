@@ -1,0 +1,121 @@
+# ==================================
+# OS Generated Files
+# ==================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ==================================
+# IDE and Editor Files
+# ==================================
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### Eclipse / STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+.history/
+
+# ==================================
+# Java / Spring Boot / Gradle
+# ==================================
+HELP.md
+demo/build/
+demo/.gradle/
+demo/out/
+!demo/gradle/wrapper/gradle-wrapper.jar
+!demo/**/src/main/**/build/
+!demo/**/src/test/**/build/
+*.class
+*.jar
+!**/gradle-wrapper.jar
+*.war
+*.ear
+
+# ==================================
+# Angular / Node.js
+# ==================================
+manage/node_modules/
+manage/dist/
+manage/tmp/
+manage/out-tsc/
+manage/bazel-out/
+manage/.angular/
+manage/.sass-cache/
+manage/connect.lock
+manage/coverage/
+manage/libpeerconnection.log
+manage/testem.log
+manage/typings/
+*.c9/
+*.launch
+*.sublime-workspace
+
+# npm / yarn
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+.npm/
+.yarn-integrity
+
+# ==================================
+# Environment & Secrets
+# ==================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+*.key
+
+# ==================================
+# Logs
+# ==================================
+logs/
+*.log
+
+# ==================================
+# Miscellaneous
+# ==================================
+*.swp
+*.swo
+*~
+.cache/
+.temp/

@@ -1,0 +1,28 @@
+<div class="background">
+  <div class="form">
+    <div class="form-text">
+      <div class="logo">
+        <img src="https://storage.googleapis.com/hust-files/images/logo_telsoft(1)_15.9k.png" alt="logo">
+      </div>
+      <h2>Welcome back</h2>
+      <p>Please enter your username and password.</p>
+    </div>
+    <div class="form-input">
+      <div class="username-label">
+        <h4>Username</h4>
+        <input type="text" [(ngModel)]="username" placeholder="Enter username">
+      </div>
+      <div class="password-label">
+        <h4>Password</h4>
+        <input type="password" [(ngModel)]="password" placeholder="Enter password">
+      </div>
+      @if (errorMessage) {
+      <div class="error-message">{{ errorMessage }}</div>
+      }
+    </div>
+    <div class="btn-container">
+      <button type="button" class="btn" (click)="onLogin()">Sign In</button>
+    </div>
+
+  </div>
+</div>

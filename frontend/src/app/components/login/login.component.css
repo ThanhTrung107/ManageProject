@@ -1,0 +1,99 @@
+h1{
+  color: #FFF
+}
+html{
+  background-color: azure;
+}
+.form{
+  width: 40%;
+  margin: auto auto;
+  padding: 50px 60px;
+  background: #FFFFFF;
+  border: black solid 1px;
+  border-radius: 30px;
+}
+.form-text{
+  width: 100%;
+  text-align: center;
+}
+.logo{
+  width: 30%;
+  margin: 0 auto;
+}
+.logo img{
+  width: 100%;
+}
+.form-text h2{
+  font-size: 36px;
+}
+.form-text p{
+  font-size: 24px;
+  color: grey;
+}
+.form-input{
+  width: 100%;
+}
+.username-label,
+.password-label{
+  width: 100%;
+}
+.username-label input{
+  width: 100%;
+  height: 30px;
+  border: 1px solid grey;
+  border-radius: 10px;
+}
+.password-label input{
+  width: 100%;
+  height: 30px;
+  border: 1px solid grey;
+  border-radius: 10px;
+}
+.form-input h4{
+  font-size: 20px;
+}
+.btn-container{
+  text-align: center;
+  margin-top: 50px;
+}
+.btn{
+  text-decoration: none;
+  color: #FFFFFF;
+  font-family: "Inter Semi Bold";
+  margin: 0 auto;
+  padding: 10px 40px;
+  background-color: cornflowerblue;
+  border-radius: 30px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+}
+
+.error-message {
+  color: #e74c3c;
+  background-color: #fadbd8;
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin-top: 15px;
+  font-size: 14px;
+  text-align: center;
+  border: 1px solid #e74c3c;
+}
+
+.info-text {
+  margin-top: 20px;
+  text-align: center;
+  
+  small {
+    color: #666;
+    font-size: 13px;
+    
+    code {
+      background: #f4f4f4;
+      padding: 2px 6px;
+      border-radius: 3px;
+      color: #008060;
+      font-weight: 600;
+    }
+  }
+}

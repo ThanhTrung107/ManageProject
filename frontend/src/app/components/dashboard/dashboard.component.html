@@ -1,0 +1,548 @@
+<div class="dashboard-container">
+  <div class="header-section">
+    <h2 class="mt-7 mb-14 font-medium font-serif" style="font-size: 28px;">Danh sách nhân viên</h2>
+    <ng-container *ngIf="isAdmin()">
+      <p-button label="Thêm nhân viên" icon="pi pi-plus" (onClick)="openAddDialog()" />
+    </ng-container>
+  </div>
+
+
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+
+  <!-- Confirm Dialog -->
+  <p-confirmDialog />
+
+  <p-table #dt1 *ngIf="!error" [value]="staffs" stripedRows [customSort]="true" (sortFunction)="customSort($event)"
+    [globalFilterFields]="['fullname', 'email', 'phone', 'genderDisplay', 'address', 'statusDisplay']"
+    [tableStyle]="{'min-width': '50rem'}">
+
+    <ng-template #caption>
+      <div class="flex">
+        <p-iconfield iconPosition="left" class="ml-auto">
+          <p-inputicon>
+            <i class="pi pi-search"></i>
+          </p-inputicon>
+          <input pInputText type="text" (input)="dt1.filterGlobal($any($event.target).value, 'contains')"
+            placeholder="Search keyword" />
+        </p-iconfield>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="id" style="width:10%">ID <p-sortIcon field="id" /></th>
+        <th pSortableColumn="fullname" style="width:10%">Tên <p-sortIcon field="fullname" /></th>
+        <th pSortableColumn="email" style="width:10%">Email <p-sortIcon field="email" /></th>
+        <th>Số điện thoại</th>
+        <th>Giới tính</th>
+        <th>Địa chỉ</th>
+        <th>Trạng thái</th>
+        <th>Hành vi</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-staff>
+      <tr>
+        <td>{{ staff.id }}</td>
+        <td>{{ staff.fullname }}</td>
+        <td>{{ staff.email }}</td>
+        <td>{{ staff.phone }}</td>
+        <td>{{ staff.genderDisplay }}</td>
+        <td>{{ staff.address }}</td>
+        <td [ngClass]="staff.status === '1' ? 'status-active' : 'status-inactive'">{{ staff.statusDisplay }}</td>
+        <td>
+          <p-button icon="pi pi-eye" [rounded]="true" [text]="true" severity="info" (onClick)="viewStaff(staff.id)" />
+          <ng-container *ngIf="isAdmin()">
+            <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="warn" (onClick)="editStaff(staff)" />
+            <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger"
+              (onClick)="deleteStaff(staff.id)" />
+          </ng-container>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- Dialog xem thông tin nhân viên -->
+<p-dialog header="Thông tin nhân viên" [(visible)]="viewDialogVisible" [modal]="true" [style]="{width: '50vw'}"
+  [draggable]="false" [resizable]="false">
+
+  <div *ngIf="selectedStaff" class="staff-details">
+    <div class="field">
+      <label>ID:</label>
+      <span>{{ selectedStaff.id }}</span>
+    </div>
+
+    <div class="field">
+      <label>Họ và tên:</label>
+      <span>{{ selectedStaff.fullname }}</span>
+    </div>
+
+    <div class="field">
+      <label>Email:</label>
+      <span>{{ selectedStaff.email }}</span>
+    </div>
+
+    <div class="field">
+      <label>Số điện thoại:</label>
+      <span>{{ selectedStaff.phone }}</span>
+    </div>
+
+    <div class="field">
+      <label>Giới tính:</label>
+      <span>{{ selectedStaff.gender === '1' ? 'Nam' : 'Nữ' }}</span>
+    </div>
+
+    <div class="field">
+      <label>Địa chỉ:</label>
+      <span>{{ selectedStaff.address }}</span>
+    </div>
+
+    <div class="field">
+      <label>Trạng thái:</label>
+      <span [ngClass]="selectedStaff.status === '1' ? 'status-active' : 'status-inactive'">
+        {{ selectedStaff.status === '1' ? 'Đang hoạt động' : 'Ngừng hoạt động' }}
+      </span>
+    </div>
+
+    <div class="field">
+      <label>CCCD:</label>
+      <span>{{ selectedStaff.citizenId }}</span>
+    </div>
+    <div class="field">
+      <label>Ngày sinh:</label>
+      <span>{{ selectedStaff.birthday | date:'dd/MM/yyyy' }}</span>
+    </div>
+    <div class="field">
+      <label>Chức vụ:</label>
+      <span>{{ selectedStaff.position_id }}</span>
+    </div>
+    <div class="field">
+      <label>Phòng ban:</label>
+      <span>{{ selectedStaff.department_id }}</span>
+    </div>
+    <div class="field">
+      <label>Ngày bắt đầu làm việc:</label>
+      <span>{{ selectedStaff.join_date | date:'dd/MM/yyyy' }}</span>
+    </div>
+
+    <div class="salary-button-container" style="margin-top: 20px; text-align: center;">
+      <p-button label="Chi tiết lương" icon="pi pi-money-bill" (onClick)="openSalaryDialog()" />
+    </div>
+
+  </div>
+</p-dialog>
+
+<!-- Dialog danh sách lương nhân viên -->
+<p-dialog header="Danh sách lương nhân viên" [(visible)]="salaryDialogVisible" [modal]="true" [style]="{width: '60vw'}"
+  [draggable]="false" [resizable]="false">
+
+  <div *ngIf="selectedStaff" class="salary-info">
+    <p><strong>Nhân viên:</strong> {{ selectedStaff.fullname }}</p>
+  </div>
+
+  <div *ngIf="salaryLoading" style="text-align: center; padding: 20px;">
+    <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+    <p>Đang tải dữ liệu...</p>
+  </div>
+
+  <p-table *ngIf="!salaryLoading && staffSalaries.length > 0" [value]="staffSalaries"
+    [tableStyle]="{'min-width': '40rem'}">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>ID</th>
+        <th>Tháng</th>
+        <th>Lương cơ bản</th>
+        <th>Thưởng</th>
+        <th>Tổng</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-salary>
+      <tr>
+        <td>{{ salary.id }}</td>
+        <td>{{ salary.month }}</td>
+        <td>{{ salary.basicSalary | number:'1.0-0' }} VNĐ</td>
+        <td>{{ salary.bonus | number:'1.0-0' }} VNĐ</td>
+        <td>{{ (salary.basicSalary || 0) + (salary.bonus || 0) | number:'1.0-0' }} VNĐ</td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <div *ngIf="!salaryLoading && staffSalaries.length === 0" style="text-align: center; padding: 20px;">
+    <p>Không có dữ liệu lương cho nhân viên này.</p>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Đóng" icon="pi pi-times" (onClick)="salaryDialogVisible = false" severity="secondary" />
+  </ng-template>
+</p-dialog>
+
+<!-- Dialog sửa thông tin nhân viên -->
+<p-dialog header="Sửa thông tin nhân viên" [(visible)]="editDialogVisible" [modal]="true" [style]="{width: '50vw'}"
+  [draggable]="false" [resizable]="false">
+
+  <div class="edit-form">
+    <div class="form-field">
+      <label for="fullname">Họ và tên: <span class="required">*</span></label>
+      <input pInputText id="fullname" [(ngModel)]="editingStaff.fullname" (ngModelChange)="clearEditError('fullname')"
+        class="w-full" />
+      <small *ngIf="editErrors['fullname']" class="error-text">{{ editErrors['fullname'] }}</small>
+    </div>
+
+    <div class="form-field">
+      <label for="email">Email: <span class="required">*</span></label>
+      <input pInputText id="email" type="email" [(ngModel)]="editingStaff.email"
+        (ngModelChange)="clearEditError('email')" class="w-full" />
+      <small *ngIf="editErrors['email']" class="error-text">{{ editErrors['email'] }}</small>
+    </div>
+
+    <div class="form-field">
+      <label for="phone">Số điện thoại: <span class="required">*</span></label>
+      <input pInputText id="phone" [(ngModel)]="editingStaff.phone" (ngModelChange)="clearEditError('phone')"
+        class="w-full" />
+      <small *ngIf="editErrors['phone']" class="error-text">{{ editErrors['phone'] }}</small>
+    </div>
+
+    <div class="form-field">
+      <label for="gender">Giới tính: <span class="required">*</span></label>
+      <p-dropdown id="gender" [(ngModel)]="editingStaff.gender" (ngModelChange)="clearEditError('gender')"
+        [options]="genderOptions" optionLabel="label" optionValue="value" placeholder="Chọn giới tính" class="w-full" />
+      <small *ngIf="editErrors['gender']" class="error-text">{{ editErrors['gender'] }}</small>
+    </div>
+
+    <div class="form-field">
+      <label for="address">Địa chỉ: <span class="required">*</span></label>
+      <input pInputText id="address" [(ngModel)]="editingStaff.address" (ngModelChange)="clearEditError('address')"
+        class="w-full" />
+      <small *ngIf="editErrors['address']" class="error-text">{{ editErrors['address'] }}</small>
+    </div>
+
+    <div class="form-field">
+      <label for="status">Trạng thái: <span class="required">*</span></label>
+      <p-dropdown id="status" [(ngModel)]="editingStaff.status" (ngModelChange)="clearEditError('status')"
+        [options]="statusOptions" optionLabel="label" optionValue="value" placeholder="Chọn trạng thái"
+        class="w-full" />
+      <small *ngIf="editErrors['status']" class="error-text">{{ editErrors['status'] }}</small>
+    </div>
+
+    <div class="form-field">
+      <label for="citizenId">CCCD: <span class="required">*</span></label>
+      <input pInputText id="citizenId" [(ngModel)]="editingStaff.citizenId"
+        (ngModelChange)="clearEditError('citizenId')" class="w-full" />
+      <small *ngIf="editErrors['citizenId']" class="error-text">{{ editErrors['citizenId'] }}</small>
+    </div>
+
+    <div class="form-field">
+      <label for="position">Chức vụ: <span class="required">*</span></label>
+      <p-dropdown id="position" [(ngModel)]="editingStaff.position_id" (ngModelChange)="clearEditError('position_id')"
+        [options]="positionOptions" optionLabel="label" optionValue="value" placeholder="Chọn chức vụ" class="w-full" />
+      <small *ngIf="editErrors['position_id']" class="error-text">{{ editErrors['position_id'] }}</small>
+    </div>
+
+    <div class="form-field">
+      <label for="birthday">Ngày sinh: <span class="required">*</span></label>
+      <input pInputText id="birthday" type="date" [(ngModel)]="editingStaff.birthday"
+        (ngModelChange)="clearEditError('birthday')" class="w-full" />
+      <small *ngIf="editErrors['birthday']" class="error-text">{{ editErrors['birthday'] }}</small>
+    </div>
+
+    <div class="form-field">
+      <label for="department_id">Phòng ban: <span class="required">*</span></label>
+      <input pInputText id="department_id" [(ngModel)]="editingStaff.department_id" class="w-full"
+        style="text-transform: uppercase;" />
+      <small *ngIf="editErrors['department_id']" class="error-text">{{ editErrors['department_id'] }}</small>
+    </div>
+
+    <div class="form-field">
+      <label for="join_date">Ngày bắt đầu làm việc: <span class="required">*</span></label>
+      <input pInputText id="join_date" type="date" [(ngModel)]="editingStaff.join_date"
+        (ngModelChange)="clearEditError('join_date')" class="w-full" />
+      <small *ngIf="editErrors['join_date']" class="error-text">{{ editErrors['join_date'] }}</small>
+    </div>
+
+    <!-- Phần sửa bảng lương -->
+    <div class="salary-section" style="margin-top: 20px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <label style="font-weight: 600;">Bảng lương:</label>
+        <div style="display: flex; gap: 8px;">
+          <p-button label="Thêm lương" icon="pi pi-plus" size="small" (onClick)="openAddSalaryForEditDialog()" />
+          <p-button label="Tải bảng lương" icon="pi pi-refresh" size="small" (onClick)="loadEditSalaries()" />
+        </div>
+      </div>
+
+      <div *ngIf="editSalaryLoading" style="text-align: center; padding: 10px;">
+        <i class="pi pi-spin pi-spinner" style="font-size: 1.5rem"></i>
+      </div>
+
+      <p-table *ngIf="!editSalaryLoading && editSalaries.length > 0" [value]="editSalaries"
+        [tableStyle]="{'min-width': '100%'}">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Tháng</th>
+            <th>Lương cơ bản</th>
+            <th>Thưởng</th>
+            <th>Hành động</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-salary>
+          <tr>
+            <td>{{ salary.month }}</td>
+            <td>{{ salary.basicSalary | number:'1.0-0' }} VNĐ</td>
+            <td>{{ salary.bonus | number:'1.0-0' }} VNĐ</td>
+            <td>
+              <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="warn"
+                (onClick)="openEditSalaryDialog(salary)" />
+              <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger"
+                (onClick)="deleteSalary(salary.id)" />
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+      <div *ngIf="!editSalaryLoading && editSalaries.length === 0"
+        style="text-align: center; padding: 10px; color: #6b7280;">
+        Chưa có bảng lương. Nhấn "Tải bảng lương" để tải dữ liệu.
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Hủy" icon="pi pi-times" (onClick)="editDialogVisible = false" severity="secondary" />
+    <p-button label="Lưu" icon="pi pi-check" (onClick)="saveStaff()" />
+  </ng-template>
+</p-dialog>
+
+<!-- Dialog sửa bảng lương -->
+<p-dialog header="Sửa bảng lương" [(visible)]="editSalaryDialogVisible" [modal]="true" [style]="{width: '40vw'}"
+  [draggable]="false" [resizable]="false">
+
+  <div class="edit-form">
+    <!-- Hiển thị lỗi chung -->
+    <div *ngIf="editSalaryErrors['general']" class="dialog-error-message">
+      <i class="pi pi-exclamation-circle"></i>
+      {{ editSalaryErrors['general'] }}
+    </div>
+
+    <div class="form-field">
+      <label for="edit_salary_month">Tháng: <span class="required">*</span></label>
+      <input pInputText id="edit_salary_month" type="number" [(ngModel)]="editingSalary.month"
+        (ngModelChange)="clearEditSalaryError('month')" class="w-full" />
+      <small *ngIf="editSalaryErrors['month']" class="error-text">{{ editSalaryErrors['month'] }}</small>
+    </div>
+
+    <div class="form-field">
+      <label for="edit_salary_basic">Lương cơ bản: <span class="required">*</span></label>
+      <input pInputText id="edit_salary_basic" type="number" [(ngModel)]="editingSalary.basicSalary"
+        (ngModelChange)="clearEditSalaryError('basicSalary')" class="w-full" />
+      <small *ngIf="editSalaryErrors['basicSalary']" class="error-text">{{ editSalaryErrors['basicSalary'] }}</small>
+    </div>
+
+    <div class="form-field">
+      <label for="edit_salary_bonus">Thưởng:</label>
+      <input pInputText id="edit_salary_bonus" type="number" [(ngModel)]="editingSalary.bonus"
+        (ngModelChange)="clearEditSalaryError('bonus')" class="w-full" />
+      <small *ngIf="editSalaryErrors['bonus']" class="error-text">{{ editSalaryErrors['bonus'] }}</small>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Hủy" icon="pi pi-times" (onClick)="editSalaryDialogVisible = false" severity="secondary" />
+    <p-button label="Lưu" icon="pi pi-check" (onClick)="saveEditSalary()" />
+  </ng-template>
+</p-dialog>
+
+<!-- Dialog thêm lương mới cho nhân viên đang edit -->
+<p-dialog header="Thêm bảng lương" [(visible)]="addSalaryForEditDialogVisible" [modal]="true" [style]="{width: '40vw'}"
+  [draggable]="false" [resizable]="false">
+
+  <div class="edit-form">
+    <!-- Hiển thị lỗi chung -->
+    <div *ngIf="addSalaryForEditErrors['general']" class="dialog-error-message">
+      <i class="pi pi-exclamation-circle"></i>
+      {{ addSalaryForEditErrors['general'] }}
+    </div>
+
+    <div class="form-field">
+      <label for="add_edit_salary_month">Tháng: <span class="required">*</span></label>
+      <input pInputText id="add_edit_salary_month" type="number" [(ngModel)]="newSalaryForEdit.month"
+        (ngModelChange)="clearAddSalaryForEditError('month')" class="w-full" placeholder="VD: 1, 2, 3..." />
+      <small *ngIf="addSalaryForEditErrors['month']" class="error-text">{{ addSalaryForEditErrors['month'] }}</small>
+    </div>
+
+    <div class="form-field">
+      <label for="add_edit_salary_basic">Lương cơ bản: <span class="required">*</span></label>
+      <input pInputText id="add_edit_salary_basic" type="number" [(ngModel)]="newSalaryForEdit.basicSalary"
+        (ngModelChange)="clearAddSalaryForEditError('basicSalary')" class="w-full" placeholder="VD: 10000000" />
+      <small *ngIf="addSalaryForEditErrors['basicSalary']" class="error-text">{{ addSalaryForEditErrors['basicSalary']
+        }}</small>
+    </div>
+
+    <div class="form-field">
+      <label for="add_edit_salary_bonus">Thưởng:</label>
+      <input pInputText id="add_edit_salary_bonus" type="number" [(ngModel)]="newSalaryForEdit.bonus"
+        (ngModelChange)="clearAddSalaryForEditError('bonus')" class="w-full" placeholder="VD: 1000000" />
+      <small *ngIf="addSalaryForEditErrors['bonus']" class="error-text">{{ addSalaryForEditErrors['bonus'] }}</small>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Hủy" icon="pi pi-times" (onClick)="addSalaryForEditDialogVisible = false" severity="secondary" />
+    <p-button label="Thêm" icon="pi pi-check" (onClick)="createSalaryForEdit()" />
+  </ng-template>
+</p-dialog>
+
+<!-- Dialog thêm nhân viên mới -->
+<p-dialog header="Thêm nhân viên mới" [(visible)]="addDialogVisible" [modal]="true" [style]="{width: '50vw'}"
+  [draggable]="false" [resizable]="false">
+
+  <div class="edit-form">
+    <div class="form-field">
+      <label for="add_fullname">Họ và tên: <span class="required">*</span></label>
+      <input pInputText id="add_fullname" [(ngModel)]="addingStaff.fullname" (ngModelChange)="clearAddError('fullname')"
+        class="w-full" />
+      <small *ngIf="addErrors['fullname']" class="error-text">{{ addErrors['fullname'] }}</small>
+    </div>
+
+    <div class="form-field">
+      <label for="add_email">Email: <span class="required">*</span></label>
+      <input pInputText id="add_email" type="email" [(ngModel)]="addingStaff.email"
+        (ngModelChange)="clearAddError('email')" class="w-full" />
+      <small *ngIf="addErrors['email']" class="error-text">{{ addErrors['email'] }}</small>
+    </div>
+
+    <div class="form-field">
+      <label for="add_phone">Số điện thoại: <span class="required">*</span></label>
+      <input pInputText id="add_phone" [(ngModel)]="addingStaff.phone" (ngModelChange)="clearAddError('phone')"
+        class="w-full" />
+      <small *ngIf="addErrors['phone']" class="error-text">{{ addErrors['phone'] }}</small>
+    </div>
+
+    <div class="form-field">
+      <label for="add_gender">Giới tính: <span class="required">*</span></label>
+      <p-dropdown id="add_gender" [(ngModel)]="addingStaff.gender" (ngModelChange)="clearAddError('gender')"
+        [options]="genderOptions" optionLabel="label" optionValue="value" placeholder="Chọn giới tính" class="w-full" />
+      <small *ngIf="addErrors['gender']" class="error-text">{{ addErrors['gender'] }}</small>
+    </div>
+
+    <div class="form-field">
+      <label for="add_address">Địa chỉ: <span class="required">*</span></label>
+      <input pInputText id="add_address" [(ngModel)]="addingStaff.address" (ngModelChange)="clearAddError('address')"
+        class="w-full" />
+      <small *ngIf="addErrors['address']" class="error-text">{{ addErrors['address'] }}</small>
+    </div>
+
+    <div class="form-field">
+      <label for="add_status">Trạng thái: <span class="required">*</span></label>
+      <p-dropdown id="add_status" [(ngModel)]="addingStaff.status" (ngModelChange)="clearAddError('status')"
+        [options]="statusOptions" optionLabel="label" optionValue="value" placeholder="Chọn trạng thái"
+        class="w-full" />
+      <small *ngIf="addErrors['status']" class="error-text">{{ addErrors['status'] }}</small>
+    </div>
+
+    <div class="form-field">
+      <label for="add_citizenId">Số CMND/CCCD: <span class="required">*</span></label>
+      <input pInputText id="add_citizenId" [(ngModel)]="addingStaff.citizenId"
+        (ngModelChange)="clearAddError('citizenId')" class="w-full" />
+      <small *ngIf="addErrors['citizenId']" class="error-text">{{ addErrors['citizenId'] }}</small>
+    </div>
+
+    <div class="form-field">
+      <label for="add_position_id">Chức vụ: <span class="required">*</span></label>
+      <p-dropdown id="add_position_id" [(ngModel)]="addingStaff.position_id"
+        (ngModelChange)="clearAddError('position_id')" [options]="positionOptions" optionLabel="label"
+        optionValue="value" placeholder="Chọn chức vụ" class="w-full" />
+      <small *ngIf="addErrors['position_id']" class="error-text">{{ addErrors['position_id'] }}</small>
+    </div>
+
+    <div class="form-field">
+      <label for="add_birthday">Ngày sinh: <span class="required">*</span></label>
+      <input pInputText id="add_birthday" type="date" [(ngModel)]="addingStaff.birthday"
+        (ngModelChange)="clearAddError('birthday')" class="w-full" />
+      <small *ngIf="addErrors['birthday']" class="error-text">{{ addErrors['birthday'] }}</small>
+    </div>
+
+    <div class="form-field">
+      <label for="add_department_id">Phòng ban: <span class="required">*</span></label>
+      <input pInputText id="add_department_id" [(ngModel)]="addingStaff.department_id" class="w-full"
+        style="text-transform: uppercase;" />
+      <small *ngIf="addErrors['department_id']" class="error-text">{{ addErrors['department_id'] }}</small>
+    </div>
+
+    <div class="form-field">
+      <label for="add_join_date">Ngày bắt đầu làm việc: <span class="required">*</span></label>
+      <input pInputText id="add_join_date" type="date" [(ngModel)]="addingStaff.join_date"
+        (ngModelChange)="clearAddError('join_date')" class="w-full" />
+      <small *ngIf="addErrors['join_date']" class="error-text">{{ addErrors['join_date'] }}</small>
+    </div>
+
+    <!-- Phần thêm bảng lương -->
+    <div class="salary-section" style="margin-top: 20px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <label style="font-weight: 600;">Bảng lương:</label>
+        <p-button label="Thêm bảng lương" icon="pi pi-plus" size="small" (onClick)="openAddSalaryDialog()" />
+      </div>
+
+      <p-table *ngIf="tempSalaries.length > 0" [value]="tempSalaries" [tableStyle]="{'min-width': '100%'}">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Tháng</th>
+            <th>Lương cơ bản</th>
+            <th>Thưởng</th>
+            <th>Hành động</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-salary let-i="rowIndex">
+          <tr>
+            <td>{{ salary.month }}</td>
+            <td>{{ salary.basicSalary | number:'1.0-0' }} VNĐ</td>
+            <td>{{ salary.bonus | number:'1.0-0' }} VNĐ</td>
+            <td>
+              <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger"
+                (onClick)="removeTempSalary(i)" />
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+      <div *ngIf="tempSalaries.length === 0" style="text-align: center; padding: 10px; color: #6b7280;">
+        Chưa có bảng lương nào được thêm.
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Hủy" icon="pi pi-times" (onClick)="addDialogVisible = false" severity="secondary" />
+    <p-button label="Thêm" icon="pi pi-check" (onClick)="createStaff()" />
+  </ng-template>
+</p-dialog>
+
+<!-- Dialog thêm bảng lương mới -->
+<p-dialog header="Thêm bảng lương" [(visible)]="addSalaryDialogVisible" [modal]="true" [style]="{width: '40vw'}"
+  [draggable]="false" [resizable]="false">
+
+  <div class="edit-form">
+    <div class="form-field">
+      <label for="salary_month">Tháng: <span class="required">*</span></label>
+      <input pInputText id="salary_month" type="number" [(ngModel)]="newSalary.month"
+        (ngModelChange)="clearSalaryError('month')" class="w-full" placeholder="VD: 1, 2, 3..." />
+      <small *ngIf="salaryErrors['month']" class="error-text">{{ salaryErrors['month'] }}</small>
+    </div>
+
+    <div class="form-field">
+      <label for="salary_basic">Lương cơ bản: <span class="required">*</span></label>
+      <input pInputText id="salary_basic" type="number" [(ngModel)]="newSalary.basicSalary"
+        (ngModelChange)="clearSalaryError('basicSalary')" class="w-full" placeholder="VD: 10000000" />
+      <small *ngIf="salaryErrors['basicSalary']" class="error-text">{{ salaryErrors['basicSalary'] }}</small>
+    </div>
+
+    <div class="form-field">
+      <label for="salary_bonus">Thưởng:</label>
+      <input pInputText id="salary_bonus" type="number" [(ngModel)]="newSalary.bonus"
+        (ngModelChange)="clearSalaryError('bonus')" class="w-full" placeholder="VD: 1000000" />
+      <small *ngIf="salaryErrors['bonus']" class="error-text">{{ salaryErrors['bonus'] }}</small>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Hủy" icon="pi pi-times" (onClick)="addSalaryDialogVisible = false" severity="secondary" />
+    <p-button label="Thêm" icon="pi pi-check" (onClick)="addTempSalary()" />
+  </ng-template>
+</p-dialog>
