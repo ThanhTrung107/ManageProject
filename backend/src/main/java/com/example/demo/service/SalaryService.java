@@ -7,6 +7,9 @@ import com.example.demo.entity.Staff;
 import com.example.demo.exception.StaffException;
 import com.example.demo.repository.SalaryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,11 +20,12 @@ public class SalaryService {
   private SalaryRepository salaryRepository;
   @Autowired
   private StaffService staffService;
-
+  @Cacheable(value = "salaries", key = "#staffId")
   public List<Salary> getSalariesByStaffId(long staffId) {
     return salaryRepository.findByStaffId(staffId);
   }
 
+  @CacheEvict(value = "salaries", key = "#staffId")
   public Salary createSalary(long staffId, SalaryCreationRequest request) {
 
     if (salaryRepository.existsByStaffIdAndMonth(staffId, request.getMonth())) {
@@ -38,6 +42,9 @@ public class SalaryService {
     return salaryRepository.save(salary);
   }
 
+  @Caching(evict = {
+    @CacheEvict(value = "salaries", allEntries = true)
+  })
   public Salary updateSalary(long salaryId, SalaryUpdateRequest request) {
     Salary salary = salaryRepository.findById(salaryId)
       .orElseThrow(() -> new RuntimeException("Không tìm thấy bản ghi lương với ID: " + salaryId));
@@ -52,7 +59,9 @@ public class SalaryService {
     salary.setMonth(request.getMonth());
     return salaryRepository.save(salary);
   }
-
+  @Caching(evict = {
+    @CacheEvict(value = "salaries", allEntries = true)
+  })
   public void deleteSalary(long salaryId) {
     salaryRepository.deleteById(salaryId);
   }

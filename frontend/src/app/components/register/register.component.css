@@ -33,6 +33,11 @@
   padding-left: 2.5rem !important;
 }
 
+/* Override PrimeNG select to full width */
+:host ::ng-deep .p-select {
+  width: 100%;
+}
+
 /* IconField styling */
 :host ::ng-deep p-iconfield {
   display: block;

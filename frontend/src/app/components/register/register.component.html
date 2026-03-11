@@ -8,8 +8,8 @@
 
       <!-- Title -->
       <div class="text-center mb-6">
-        <h2 class="text-3xl font-bold text-gray-800 mb-2">Đăng nhập</h2>
-        <p class="text-gray-500">Chào mừng bạn trở lại</p>
+        <h2 class="text-3xl font-bold text-gray-800 mb-2">Đăng ký</h2>
+        <p class="text-gray-500">Tạo tài khoản mới</p>
       </div>
 
       <!-- Form -->
@@ -48,6 +48,38 @@
           </div>
         </div>
 
+        <!-- Confirm Password -->
+        <div class="flex flex-col gap-2">
+          <label for="confirmPassword" class="font-medium text-gray-700">Xác nhận mật khẩu</label>
+          <div class="password-with-icon">
+            <i class="pi pi-lock password-icon"></i>
+            <p-password 
+              id="confirmPassword"
+              [(ngModel)]="confirmPassword" 
+              placeholder="Nhập lại mật khẩu"
+              [disabled]="isLoading"
+              [toggleMask]="true"
+              [feedback]="false"
+              styleClass="w-full"
+              inputStyleClass="w-full"
+            ></p-password>
+          </div>
+        </div>
+
+        <!-- Role Dropdown -->
+        <div class="flex flex-col gap-2">
+          <label for="role" class="font-medium text-gray-700">Vai trò</label>
+          <p-select
+            id="role"
+            [(ngModel)]="selectedRole"
+            [options]="roleOptions"
+            optionLabel="label"
+            placeholder="Chọn vai trò"
+            [disabled]="isLoading"
+            styleClass="w-full"
+          ></p-select>
+        </div>
+
         <!-- Error Message -->
         <p-message 
           *ngIf="errorMessage" 
@@ -56,24 +88,31 @@
           styleClass="w-full"
         ></p-message>
 
+        <!-- Success Message -->
+        <p-message 
+          *ngIf="successMessage" 
+          severity="success" 
+          [text]="successMessage"
+          styleClass="w-full"
+        ></p-message>
+
         <!-- Submit Button -->
         <p-button 
-          [label]="isLoading ? 'Đang xử lý...' : 'Đăng nhập'" 
-          icon="pi pi-sign-in"
+          [label]="isLoading ? 'Đang xử lý...' : 'Đăng ký'" 
+          icon="pi pi-user-plus"
           [loading]="isLoading"
-          [disabled]="isLoading"
-          (onClick)="onLogin()"
+          (onClick)="onRegister()"
           styleClass="w-full"
           severity="primary"
         ></p-button>
 
         <p-divider></p-divider>
 
-        <!-- Register Link -->
+        <!-- Login Link -->
         <div class="text-center">
-          <span class="text-gray-600">Chưa có tài khoản? </span>
-          <a routerLink="/register" class="text-blue-500 font-semibold hover:text-blue-700 no-underline">
-            Đăng ký ngay
+          <span class="text-gray-600">Đã có tài khoản? </span>
+          <a routerLink="/login" class="text-blue-500 font-semibold hover:text-blue-700 no-underline">
+            Đăng nhập
           </a>
         </div>
       </div>

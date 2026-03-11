@@ -22,7 +22,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
   implementation 'com.oracle.database.jdbc:ojdbc11:23.3.0.23.09'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+  //Comment để tránh lỗi với redis(tạm thời)
+//	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
   runtimeOnly 'com.oracle.database.jdbc:ojdbc11'
@@ -31,6 +33,16 @@ dependencies {
 //  runtimeOnly 'com.mysql:mysql-connector-j'
 //  compileOnly "org.projectlombok:lombok:1.18.36"
 //  annotationProcessor "org.projectlombok:lombok:1.18.36"
+
+  implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
+  runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
+  runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+  implementation 'org.springframework.boot:spring-boot-starter-security'
+
+  // Redis
+  implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+  // Cache
+  implementation 'org.springframework.boot:spring-boot-starter-cache'
 }
 
 tasks.named('test') {

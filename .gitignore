@@ -55,12 +55,12 @@ bin/
 # Java / Spring Boot / Gradle
 # ==================================
 HELP.md
-demo/build/
-demo/.gradle/
-demo/out/
-!demo/gradle/wrapper/gradle-wrapper.jar
-!demo/**/src/main/**/build/
-!demo/**/src/test/**/build/
+backend/build/
+backend/.gradle/
+backend/out/
+!backend/gradle/wrapper/gradle-wrapper.jar
+!backend/**/src/main/**/build/
+!backend/**/src/test/**/build/
 *.class
 *.jar
 !**/gradle-wrapper.jar
@@ -70,18 +70,18 @@ demo/out/
 # ==================================
 # Angular / Node.js
 # ==================================
-manage/node_modules/
-manage/dist/
-manage/tmp/
-manage/out-tsc/
-manage/bazel-out/
-manage/.angular/
-manage/.sass-cache/
-manage/connect.lock
-manage/coverage/
-manage/libpeerconnection.log
-manage/testem.log
-manage/typings/
+frontend/node_modules/
+frontend/dist/
+frontend/tmp/
+frontend/out-tsc/
+frontend/bazel-out/
+frontend/.angular/
+frontend/.sass-cache/
+frontend/connect.lock
+frontend/coverage/
+frontend/libpeerconnection.log
+frontend/testem.log
+frontend/typings/
 *.c9/
 *.launch
 *.sublime-workspace

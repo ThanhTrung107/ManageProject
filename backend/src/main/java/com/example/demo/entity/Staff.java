@@ -1,12 +1,17 @@
 package com.example.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
 @Entity
-public class Staff {
+public class Staff implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
@@ -23,6 +28,7 @@ public class Staff {
   private Date join_date;
 
   @OneToMany(mappedBy = "staff", cascade = CascadeType.ALL)
+  @JsonIgnore
   private List<Salary> salaries;
 
   public List<Salary> getSalaries() {

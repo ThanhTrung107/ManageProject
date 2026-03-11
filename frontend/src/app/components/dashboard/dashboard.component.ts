@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
@@ -72,13 +73,40 @@ export class DashboardComponent implements OnInit {
     { label: 'Giám đốc', value: 3 }
   ]
 
-  constructor(private staffService: StaffService, private confirmationService: ConfirmationService, public authService: AuthService, private salaryService: SalaryService) { }
+  constructor(
+    private staffService: StaffService,
+    private confirmationService: ConfirmationService,
+    public authService: AuthService,
+    private salaryService: SalaryService,
+    private router: Router
+  ) { }
 
   ngOnInit() {
     this.loadStaffs();
   }
-  isAdmin(): boolean {
+  get isAdmin(): boolean {
     return this.authService.isAdmin();
+  }
+
+  get canDelete(): boolean {
+    return this.authService.canDelete();
+  }
+
+  get canCreate(): boolean {
+    return this.authService.canCreate();
+  }
+
+  get currentUsername(): string {
+    return this.authService.getUsername() || '';
+  }
+
+  get currentRole(): string {
+    return this.authService.getRole() || '';
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
   customSort(event: SortEvent) {
     if (!event.data || !event.field) return;

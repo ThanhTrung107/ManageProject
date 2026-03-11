@@ -8,6 +8,10 @@ import com.example.demo.entity.Staff;
 import com.example.demo.exception.StaffException;
 import com.example.demo.repository.StaffRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +24,9 @@ public class StaffService {
   @Autowired
   private StaffRepository staffRepository;
 
+  @Caching(evict = {
+    @CacheEvict(value = "staffs", key = "'all'")
+  })
   public Staff createStaff(StaffCreationRequest request) {
     if (staffRepository.existsByEmail(request.getEmail())) {
       throw new StaffException("email", "Email này đã tồn tại trong hệ thống");
@@ -71,6 +78,11 @@ public class StaffService {
     return staffRepository.save(staff);
   }
 
+  // Khi update, cập nhật cache của staff đó và xóa cache danh sách
+  @Caching(
+    put = {@CachePut(value = "staff", key = "#id")},
+    evict = {@CacheEvict(value = "staffs", key = "'all'")}
+  )
   public Staff updateStaff(long id, StaffUpdateRequest request) {
     Staff staff = getStaffbyID(id);
 
@@ -88,14 +100,20 @@ public class StaffService {
     return staffRepository.save(staff);
   }
 
+  @Cacheable(value = "staff", key = "#id")
   public Staff getStaffbyID(long id) {
     return staffRepository.getStaff(id);
   }
 
+  @Caching(evict = {
+    @CacheEvict(value = "staff", key = "#id"),
+    @CacheEvict(value = "staffs", key = "'all'")
+  })
   public void deleteStaff(long id) {
     staffRepository.deleteById(id);
   }
 
+  @Cacheable(value = "staffs", key = "'all'")
   public List<Staff> getStaffsWithPriority(String userSortField, String sortDir) {
 
     Sort.Direction direction = sortDir.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
